@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Livros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body class="bg-gray-100 text-gray-900 flex flex-col justify-start items-center min-h-screen">
+    <!-- Barra de Pesquisa -->
+    <div class="w-full max-w-4xl p-5">
+        <div class="text-center">
+            <input type="text" id="searchInput" placeholder="Buscar livros..." class="p-4 w-full max-w-lg border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg" />
+            <button onclick="searchBooks()" class="ml-3 px-6 py-3 bg-blue-500 text-white rounded-md">Buscar</button>
+        </div>
+    </div>
+
+    <!-- Modal para Favoritos -->
+    <div id="favoritesModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 z-50 flex justify-center items-center">
+        <div class="bg-white p-8 rounded-lg shadow-lg max-w-5xl w-full">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Livros Favoritados</h2>
+            <div id="favoriteBooks" class="space-y-4">
+                <!-- Favoritos serão listados aqui -->
+            </div>
+            <button onclick="toggleFavorites()" class="mt-4 px-6 py-3 bg-blue-500 text-white rounded-md">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Resultados de livros -->
+    <div id="bookResults" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl p-5 overflow-y-auto">
+        <!-- Resultados serão aqui -->
+    </div>
+
+    <!-- Ícone de coração para abrir os favoritos -->
+    <div class="absolute top-5 right-5">
+        <button onclick="toggleFavorites()" class="text-3xl text-gray-800 hover:text-red-600">
+            ❤️
+        </button>
+    </div>
+
+    <script>
+        // Função para buscar livros
+        function searchBooks() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) return alert("Por favor, insira um título para buscar.");
+
+            fetch(`/pesquisar?consulta=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(livros => {
+                    const bookResults = document.getElementById('bookResults');
+                    bookResults.innerHTML = '';  // Limpar resultados anteriores
+
+                    livros.forEach(livro => {
+                        const bookDiv = document.createElement('div');
+                        bookDiv.classList.add('bg-white', 'rounded-lg', 'shadow-md', 'p-6', 'text-center', 'transition-transform', 'transform', 'hover:scale-105', 'duration-200');
+                        bookDiv.innerHTML = `
+                            <h3 class="font-semibold text-lg text-gray-800">${livro.titulo}</h3>
+                            <p class="text-gray-600">${livro.autores.join(', ')}</p>
+                            <button onclick="favoriteBook('${livro.id_google}', '${livro.titulo}', '${livro.autores.join(', ')}', '${livro.descricao}')" class="text-red-500 hover:text-red-700">Favoritar</button>
+                        `;
+                        bookResults.appendChild(bookDiv);
+                    });
+                })
+                .catch(err => console.error('Erro ao buscar livros:', err));
+        }
+
+        // Função para favoritar livro
+        function favoriteBook(id_google, titulo, autores, descricao) {
+            const book = {
+                id_google,
+                titulo,
+                autores: autores.split(', '),  // Separar autores
+                descricao
+            };
+
+            fetch('/favoritar', {  
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(book)
+            })
+            .then(response => response.json())
+            .then(result => alert(result.mensagem))
+            .catch(err => console.error('Erro ao favoritar livro:', err));
+        }
+
+        // Função para mostrar/ocultar favoritos
+        function toggleFavorites() {
+            const modal = document.getElementById('favoritesModal');
+            const favoriteBooksContainer = document.getElementById('favoriteBooks');
+            favoriteBooksContainer.innerHTML = '';  // Limpar favoritos ao abrir o modal
+
+            fetch('/favoritos')  
+                .then(response => response.json())
+                .then(favoritos => {
+                    if (favoritos.length === 0) {
+                        favoriteBooksContainer.innerHTML = '<p class="text-gray-600">Nenhum livro favoritado ainda.</p>';
+                    } else {
+                        favoritos.forEach(livro => {
+                            const bookDiv = document.createElement('div');
+                            bookDiv.classList.add('bg-gray-100', 'rounded-lg', 'p-4', 'text-center', 'flex', 'justify-between', 'items-center');
+                            bookDiv.innerHTML = `
+                                <div>
+                                    <h3 class="font-semibold text-lg text-gray-800">${livro.titulo}</h3>
+                                    <p class="text-gray-600">${livro.autores}</p>
+                                </div>
+                                <!-- Botão de X para remover o livro -->
+                                <button onclick="removeFavorite(${livro.id})" class="text-red-500 hover:text-red-700 text-xl">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                            favoriteBooksContainer.appendChild(bookDiv);
+                        });
+                    }
+                })
+                .catch(err => console.error('Erro ao carregar favoritos:', err));
+
+            modal.classList.toggle('hidden');
+        }
+
+        // Função para remover o livro dos favoritos
+        function removeFavorite(id) {
+            fetch(`/remover_favorito/${id}`, {  
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert(result.mensagem);
+                toggleFavorites();  // Atualizar a lista de favoritos
+            })
+            .catch(err => console.error('Erro ao remover livro:', err));
+        }
+    </script>
+</body>
+
+</html>
