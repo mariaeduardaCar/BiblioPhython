@@ -20,13 +20,13 @@ def conectar_banco():
         # Divide a URL do banco de dados em partes
         result = urlparse(DATABASE_URL)
         conexao = psycopg2.connect(
-            database=result.path[1:],  # Remove o prefixo '/' do dbname
+            database=result.path[1:], 
             user=result.username,
             password=result.password,
             host=result.hostname,
             port=result.port
         )
-        print("Conexão bem-sucedida!")  # Apenas para confirmar a conexão
+        print("Conexão bem-sucedida!")  
         return conexao
     except Exception as e:
         print(f"Erro de conexão: {e}")
@@ -57,7 +57,7 @@ def pesquisar_livros():
             "id_google": livro.get('id'),
             "titulo": info_volume.get('title', 'Desconhecido'),
             "autores": info_volume.get('authors', ['Desconhecido']),
-            "descricao": info_volume.get('description', 'Descrição não disponível')
+             "descricao": info_volume.get('description', 'Descrição não disponível').replace('"', '\\"')  # Escapando aspas duplas
         })
     return jsonify(resultados)
 
@@ -104,7 +104,7 @@ def ver_favoritos():
     cursor.execute("SELECT * FROM favoritos")
     favoritos = cursor.fetchall()
 
-    # Converter os dados em formato JSON amigável
+    # Converter os dados em formato JSON 
     livros_favoritos = []
     for favorito in favoritos:
         livros_favoritos.append({

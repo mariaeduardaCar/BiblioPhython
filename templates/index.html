@@ -49,7 +49,7 @@
                 .then(response => response.json())
                 .then(livros => {
                     const bookResults = document.getElementById('bookResults');
-                    bookResults.innerHTML = '';  // Limpar resultados anteriores
+                    bookResults.innerHTML = '';  
 
                     livros.forEach(livro => {
                         const bookDiv = document.createElement('div');
@@ -57,40 +57,37 @@
                         bookDiv.innerHTML = `
                             <h3 class="font-semibold text-lg text-gray-800">${livro.titulo}</h3>
                             <p class="text-gray-600">${livro.autores.join(', ')}</p>
-                            <button onclick="favoriteBook('${livro.id_google}', '${livro.titulo}', '${livro.autores.join(', ')}', '${livro.descricao}')" class="text-red-500 hover:text-red-700">Favoritar</button>
-                        `;
+                            <button onclick="favoriteBook(&quot;${livro.id_google}&quot;, &quot;${livro.titulo}&quot;, &quot;${livro.autores.join(', ')}&quot;, &quot;${livro.descricao}&quot;)" class="text-red-500 hover:text-red-700"> Favoritar </button> `;
+                        
                         bookResults.appendChild(bookDiv);
                     });
                 })
                 .catch(err => console.error('Erro ao buscar livros:', err));
         }
 
-  // Função para favoritar livro
-function favoriteBook(id_google, titulo, autores, descricao) {
-    // Criar o objeto de livro
-    const book = {
-        id_google,
-        titulo,
-        autores: autores.split(', '),  // Separar autores
-        descricao
-    };
+        // Função para favoritar livro
+        function favoriteBook(id_google, titulo, autores, descricao) {
+            const book = {
+                id_google,
+                titulo,
+                autores: autores.split(', '),  // Separar autores
+                descricao
+            };
 
-    // Enviar dados ao backend
-    fetch('/favoritar', {  
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(book) // JSON.stringify deve escapar automaticamente os caracteres especiais
-    })
-    .then(response => response.json())
-    .then(result => alert(result.mensagem))
-    .catch(err => console.error('Erro ao favoritar livro:', err));
-}
-
+            fetch('/favoritar', {  
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(book)
+            })
+            .then(response => response.json())
+            .then(result => alert(result.mensagem))
+            .catch(err => console.error('Erro ao favoritar livro:', err));
+        }
         
         // Função para mostrar/ocultar favoritos
-    function toggleFavorites() {
+        function toggleFavorites() {
         const modal = document.getElementById('favoritesModal');
         const favoriteBooksContainer = document.getElementById('favoriteBooks');
         favoriteBooksContainer.innerHTML = '';  // Limpar favoritos ao abrir o modal
@@ -98,7 +95,7 @@ function favoriteBook(id_google, titulo, autores, descricao) {
         fetch('/favoritos')
             .then(response => response.json())
             .then(favoritos => {
-                console.log(favoritos);  // Verifique se a resposta da API está correta
+                console.log(favoritos);  
                 if (favoritos.length === 0) {
                     favoriteBooksContainer.innerHTML = '<p class="text-gray-600">Nenhum livro favoritado ainda.</p>';
                 } else {
