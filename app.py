@@ -108,9 +108,9 @@ def ver_favoritos():
     livros_favoritos = []
     for favorito in favoritos:
         livros_favoritos.append({
-            "titulo": favorito[0],
-            "autores": favorito[1],
-            "id": favorito[2]    
+            "titulo": favorito[2],
+            "autores": favorito[3],
+            "id": favorito[1]    
         })
 
     cursor.close()
