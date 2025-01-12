@@ -54,7 +54,7 @@ def favoritar_livro():
         with conectar_banco() as conexao:
             with conexao.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
                 cursor.execute(
-                    "INSERT INTO favoritos (google_id, titulo, autores, descricao) VALUES ($1, $2, $3, $4)",
+                    "INSERT INTO favoritos (google_id, titulo, autores, descricao) VALUES (%s, %s, %s, %s)",
                     (id_google, titulo, autores, descricao)
                 )
                 conexao.commit()
@@ -77,7 +77,7 @@ def ver_favoritos():
 def remover_favorito(id):
     with conectar_banco() as conexao:
         with conexao.cursor() as cursor:
-            cursor.execute("DELETE FROM favoritos WHERE id = $1", (id,))
+            cursor.execute("DELETE FROM favoritos WHERE id = %s", (id,))
             conexao.commit()
     return jsonify({"mensagem": "Livro removido dos favoritos com sucesso"})
 
