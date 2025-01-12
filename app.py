@@ -73,13 +73,20 @@ def ver_favoritos():
             favoritos = cursor.fetchall()
     return jsonify(favoritos)
 
-@app.route('/remover_favorito/<int:id>', methods=['DELETE'])
-def remover_favorito(id):
-    with conectar_banco() as conexao:
-        with conexao.cursor() as cursor:
-            cursor.execute("DELETE FROM favoritos WHERE id = %s", (id,))
-            conexao.commit()
-    return jsonify({"mensagem": "Livro removido dos favoritos com sucesso"})
+
+@app.route('/remover_favorito/<int:book_id>', methods=['DELETE'])
+def remover_favorito(book_id):
+    if not book_id:
+        return jsonify({'error': 'ID do livro não fornecido'}), 400
+    try:
+        with conectar_banco() as conexao:
+            with conexao.cursor() as cursor:
+                cursor.execute("DELETE FROM favoritos WHERE id = %s", (book_id,))
+                conexao.commit()
+        return jsonify({"mensagem": "Livro removido dos favoritos com sucesso"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 
 if __name__ == '__main__':

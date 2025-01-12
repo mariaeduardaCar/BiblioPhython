@@ -122,9 +122,8 @@
 
         // Função para remover o livro dos favoritos
         function removeFavorite(id) {
-            fetch(`/remover_favorito/${id}`, {  
-                method: 'DELETE'
-            })
+            fetch(`/remover_favorito/${bookId}`, { method: 'DELETE' })
+
             .then(response => response.json())
             .then(result => {
                 alert(result.mensagem);
