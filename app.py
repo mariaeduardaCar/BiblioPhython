@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import requests
 import psycopg2
-import psycopg2.extras
+from psycopg2.extras import DictCursor
 from config import DB_CONFIG, GOOGLE_BOOKS_API_URL
 
 app = Flask(__name__)
@@ -73,11 +73,12 @@ def favoritar_livro():
         print(f"Erro ao favoritar livro: {e}")  # Exibe o erro no terminal
         return jsonify({"erro": "Erro interno no servidor"}), 500
 
-# Ver livros favoritados
+
+# Rota para ver livros favoritados
 @app.route('/favoritos', methods=['GET'])
 def ver_favoritos():
     conexao = conectar_banco()
-    cursor = conexao.cursor(dictionary=True)
+    cursor = conexao.cursor(cursor_factory=DictCursor)  # Usando o DictCursor aqui
 
     cursor.execute("SELECT * FROM favoritos")
     favoritos = cursor.fetchall()
@@ -86,6 +87,7 @@ def ver_favoritos():
     conexao.close()
 
     return jsonify(favoritos)
+
 
 @app.route('/remover_favorito/<int:id>', methods=['DELETE'])
 def remover_favorito(id):
