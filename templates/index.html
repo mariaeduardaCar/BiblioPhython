@@ -40,101 +40,55 @@
     </div>
 
     <script>
-        // Função para buscar livros
-        function searchBooks() {
-            const query = document.getElementById('searchInput').value;
-            if (!query) return alert("Por favor, insira um título para buscar.");
-
-            fetch(`/pesquisar?consulta=${encodeURIComponent(query)}`)
-                .then(response => response.json())
-                .then(livros => {
-                    const bookResults = document.getElementById('bookResults');
-                    bookResults.innerHTML = '';  // Limpar resultados anteriores
-
-                    livros.forEach(livro => {
-                        const bookDiv = document.createElement('div');
-                        bookDiv.classList.add('bg-white', 'rounded-lg', 'shadow-md', 'p-6', 'text-center', 'transition-transform', 'transform', 'hover:scale-105', 'duration-200');
-                        bookDiv.innerHTML = `
-                            <h3 class="font-semibold text-lg text-gray-800">${livro.titulo}</h3>
-                            <p class="text-gray-600">${livro.autores.join(', ')}</p>
-                            <button onclick="favoriteBook('${livro.id_google}', '${livro.titulo}', '${livro.autores.join(', ')}', '${livro.descricao}')" class="text-red-500 hover:text-red-700">Favoritar</button>
-                        `;
-                        bookResults.appendChild(bookDiv);
-                    });
-                })
-                .catch(err => console.error('Erro ao buscar livros:', err));
-        }
-
-        // Função para favoritar livro
-        function favoriteBook(id_google, titulo, autores, descricao) {
-            const book = {
-                id_google,
-                titulo,
-                autores: autores.split(', '),  // Separar autores
-                descricao
-            };
-
-            fetch('/favoritar', {  
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(book)
-            })
-            .then(response => response.json())
-            .then(result => alert(result.mensagem))
-            .catch(err => console.error('Erro ao favoritar livro:', err));
-        }
-
         // Função para mostrar/ocultar favoritos
         function toggleFavorites() {
             const modal = document.getElementById('favoritesModal');
             const favoriteBooksContainer = document.getElementById('favoriteBooks');
             favoriteBooksContainer.innerHTML = '';  // Limpar favoritos ao abrir o modal
-
-        fetch('/favoritos')
-       .then(response => response.json())
-       .then(favoritos => {
-        console.log(favoritos);  // Adicione isso para ver a estrutura dos dados
-        if (favoritos.length === 0) {
-            favoriteBooksContainer.innerHTML = '<p class="text-gray-600">Nenhum livro favoritado ainda.</p>';
-        } else {
-            favoritos.forEach(livro => {
-                const bookDiv = document.createElement('div');
-                bookDiv.classList.add('bg-gray-100', 'rounded-lg', 'p-4', 'text-center', 'flex', 'justify-between', 'items-center');
-                bookDiv.innerHTML = `
-                    <div>
-                        <h3 class="font-semibold text-lg text-gray-800">${livro.titulo}</h3>
-                        <p class="text-gray-600">${livro.autores}</p>
-                    </div>
-                    <!-- Botão de X para remover o livro -->
-                    <button onclick="removeFavorite(${livro.id})" class="text-red-500 hover:text-red-700 text-xl">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                favoriteBooksContainer.appendChild(bookDiv);
-            });
+    
+            fetch('/favoritos')
+                .then(response => response.json())
+                .then(favoritos => {
+                    console.log(favoritos);  // Verifique se a resposta da API está correta
+                    if (favoritos.length === 0) {
+                        favoriteBooksContainer.innerHTML = '<p class="text-gray-600">Nenhum livro favoritado ainda.</p>';
+                    } else {
+                        favoritos.forEach(livro => {
+                            const bookDiv = document.createElement('div');
+                            bookDiv.classList.add('bg-gray-100', 'rounded-lg', 'p-4', 'text-center', 'flex', 'justify-between', 'items-center');
+                            bookDiv.innerHTML = `
+                                <div>
+                                    <h3 class="font-semibold text-lg text-gray-800">${livro.titulo}</h3>
+                                    <p class="text-gray-600">${livro.autores}</p>
+                                </div>
+                                <!-- Botão de X para remover o livro -->
+                                <button onclick="removeFavorite('${livro.id}')" class="text-red-500 hover:text-red-700 text-xl">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                            favoriteBooksContainer.appendChild(bookDiv);
+                        });
+                    }
+                })
+                .catch(err => console.error('Erro ao carregar favoritos:', err));
+    
+            modal.classList.toggle('hidden');
         }
-    })
-    .catch(err => console.error('Erro ao carregar favoritos:', err));
-
-modal.classList.toggle('hidden');
-
-        }
-
+    
         // Função para remover o livro dos favoritos
         function removeFavorite(id) {
-            fetch(`/remover_favorito/${id}`, {  
+            fetch(`/remover_favorito/${id}`, {
                 method: 'DELETE'
             })
             .then(response => response.json())
             .then(result => {
                 alert(result.mensagem);
-                toggleFavorites();  // Atualizar a lista de favoritos
+                toggleFavorites();  // Atualiza a lista de favoritos após remoção
             })
             .catch(err => console.error('Erro ao remover livro:', err));
         }
     </script>
+    
 </body>
 
 </html>
