@@ -2,17 +2,33 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import psycopg2
 from config import DB_CONFIG, GOOGLE_BOOKS_API_URL
+import os
+from urllib.parse import urlparse
 
 app = Flask(__name__)
+
+
+# Pega a URL do banco de dados da variável de ambiente (Heroku)
+DATABASE_URL = os.getenv('DATABASE_URL', 'postgres://uf3uml6ni9h6js:pdef26903eaaf81e4645b81426de68949f195b3114e97581349dacdcde3254cf6@c9pv5s2sq0i76o.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/dbgdoj5djua7n7')
 
 # Função para conectar ao banco de dados
 def conectar_banco():
     try:
-        conexao = psycopg2.connect(**DB_CONFIG)
+        # Divide a URL do banco de dados em partes
+        result = urlparse(DATABASE_URL)
+        conexao = psycopg2.connect(
+            database=result.path[1:],  # Remove o prefixo '/' do dbname
+            user=result.username,
+            password=result.password,
+            host=result.hostname,
+            port=result.port
+        )
+        print("Conexão bem-sucedida!")  # Apenas para confirmar a conexão
         return conexao
-    except psycopg2.OperationalError as e:
+    except Exception as e:
         print(f"Erro de conexão: {e}")
         return None
+
 
 # Rota para a página inicial (index)
 @app.route('/')
