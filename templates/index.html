@@ -65,27 +65,34 @@
                 .catch(err => console.error('Erro ao buscar livros:', err));
         }
 
-        // Função para favoritar livro
-        function favoriteBook(id_google, titulo, autores, descricao) {
-            const book = {
-                id_google,
-                titulo,
-                autores: autores.split(', '),  // Separar autores
-                descricao
-            };
+  // Função para favoritar livro
+function favoriteBook(id_google, titulo, autores, descricao) {
+    // Escapar a descrição e o título
+    const safeTitulo = escapeString(titulo);
+    const safeDescricao = escapeString(descricao);
 
-            fetch('/favoritar', {  
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(book)
-            })
-            .then(response => response.json())
-            .then(result => alert(result.mensagem))
-            .catch(err => console.error('Erro ao favoritar livro:', err));
-        }
-        
+    // Criar o objeto de livro com dados escapados
+    const book = {
+        id_google,
+        titulo: safeTitulo,
+        autores: autores.split(', '),  // Separar autores
+        descricao: safeDescricao
+    };
+
+    // Enviar dados ao backend
+    fetch('/favoritar', {  
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(book)
+    })
+    .then(response => response.json())
+    .then(result => alert(result.mensagem))
+    .catch(err => console.error('Erro ao favoritar livro:', err));
+}
+
+
         // Função para mostrar/ocultar favoritos
     function toggleFavorites() {
         const modal = document.getElementById('favoritesModal');
