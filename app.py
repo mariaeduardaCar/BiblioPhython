@@ -4,8 +4,10 @@ import psycopg2
 from config import DB_CONFIG, GOOGLE_BOOKS_API_URL
 import os
 from urllib.parse import urlparse
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 
 # Pega a URL do banco de dados da variável de ambiente (Heroku)
@@ -96,15 +98,25 @@ def ver_favoritos():
     conexao = conectar_banco()
     if conexao is None:
         return jsonify({"erro": "Erro ao conectar ao banco de dados"}), 500
-    
+
     cursor = conexao.cursor()
     cursor.execute("SELECT * FROM favoritos")
     favoritos = cursor.fetchall()
 
+    # Converter os dados em formato JSON amigável
+    livros_favoritos = []
+    for favorito in favoritos:
+        livros_favoritos.append({
+            "id": favorito[0],  # Ajuste conforme a estrutura da tabela
+            "titulo": favorito[1],
+            "autores": favorito[2]
+        })
+
     cursor.close()
     conexao.close()
 
-    return jsonify(favoritos)
+    return jsonify(livros_favoritos)
+
 
 # Rota para remover livro dos favoritos
 @app.route('/remover_favorito/<int:id>', methods=['DELETE'])
