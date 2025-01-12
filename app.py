@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, render_template
 import requests
 import psycopg2
-from psycopg2.extras import DictCursor
 from config import DB_CONFIG, GOOGLE_BOOKS_API_URL
 
 app = Flask(__name__)
@@ -54,7 +53,8 @@ def favoritar_livro():
             return jsonify({"erro": "Campos obrigatórios ausentes"}), 400
 
         conexao = conectar_banco()
-        cursor = conexao.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor = conexao.cursor()
+
 
 
         cursor.execute(
@@ -78,7 +78,8 @@ def favoritar_livro():
 @app.route('/favoritos', methods=['GET'])
 def ver_favoritos():
     conexao = conectar_banco()
-    cursor = conexao.cursor(cursor_factory=DictCursor)  # Usando o DictCursor aqui
+    cursor = conexao.cursor()
+
 
     cursor.execute("SELECT * FROM favoritos")
     favoritos = cursor.fetchall()
