@@ -89,7 +89,7 @@
         // Função para mostrar/ocultar favoritos
         function toggleFavorites() {
             const modal = document.getElementById('favoritesModal');
-            const favoriteBooksContainer = document.getElementById('favoritos-lista');
+            const favoriteBooksContainer = document.getElementById('favoriteBooks');
             favoriteBooksContainer.innerHTML = '';  // Limpar favoritos ao abrir o modal
 
             fetch('/favoritos')
