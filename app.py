@@ -3,6 +3,7 @@ import requests
 import psycopg2
 from config import DB_CONFIG, GOOGLE_BOOKS_API_URL
 import os
+import psycopg2
 from urllib.parse import urlparse
 from flask_cors import CORS
 
@@ -107,9 +108,9 @@ def ver_favoritos():
     livros_favoritos = []
     for favorito in favoritos:
         livros_favoritos.append({
-            "id": favorito[0],  # Ajuste conforme a estrutura da tabela
-            "titulo": favorito[1],
-            "autores": favorito[2]
+            "titulo": favorito[0],
+            "autores": favorito[1],
+            "id": favorito[2]    
         })
 
     cursor.close()

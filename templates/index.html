@@ -92,9 +92,9 @@
             const favoriteBooksContainer = document.getElementById('favoriteBooks');
             favoriteBooksContainer.innerHTML = '';  // Limpar favoritos ao abrir o modal
 
-            fetch('/favoritos')
-    .then(response => response.json())
-    .then(favoritos => {
+        fetch('/favoritos')
+       .then(response => response.json())
+       .then(favoritos => {
         console.log(favoritos);  // Adicione isso para ver a estrutura dos dados
         if (favoritos.length === 0) {
             favoriteBooksContainer.innerHTML = '<p class="text-gray-600">Nenhum livro favoritado ainda.</p>';
