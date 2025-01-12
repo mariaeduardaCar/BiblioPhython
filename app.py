@@ -58,9 +58,10 @@ def favoritar_livro():
 
 
         cursor.execute(
-            "INSERT INTO favoritos (google_id, titulo, autores, descricao) VALUES ($1, $2, $3, $4)",
-            (id_google, titulo, autores, descricao)
-        )
+        "INSERT INTO favoritos (google_id, titulo, autores, descricao) VALUES (%s, %s, %s, %s)",
+        (id_google, titulo, autores, descricao)
+        ) 
+
 
         conexao.commit()
 
