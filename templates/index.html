@@ -67,12 +67,6 @@
 
         // Função para favoritar livro
         function favoriteBook(id_google, titulo, autores, descricao) {
-    // Verificar se os parâmetros estão corretos
-    if (!id_google || !titulo || !autores || !descricao) {
-        alert("Por favor, forneça todos os dados necessários.");
-        return;
-    }
-
     const book = {
         id_google,
         titulo,
@@ -80,21 +74,18 @@
         descricao
     };
 
-    // Verificar a estrutura do objeto para garantir que está correto
-    console.log(book);
+    console.log(book);  // Verifique se os dados estão estruturados corretamente
 
-    // Fazer o fetch para enviar os dados do livro
     fetch('/favoritar', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(book)
+        body: JSON.stringify(book)  // Envia os dados como string JSON
     })
     .then(response => response.json())
     .then(result => {
-        // Verificar o que está sendo retornado no resultado
-        console.log(result);
+        console.log(result);  // Veja o que é retornado da API
         alert(result.mensagem);
     })
     .catch(err => {
