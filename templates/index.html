@@ -67,16 +67,12 @@
 
   // Função para favoritar livro
 function favoriteBook(id_google, titulo, autores, descricao) {
-    // Escapar a descrição e o título
-    const safeTitulo = escapeString(titulo);
-    const safeDescricao = escapeString(descricao);
-
-    // Criar o objeto de livro com dados escapados
+    // Criar o objeto de livro
     const book = {
         id_google,
-        titulo: safeTitulo,
+        titulo,
         autores: autores.split(', '),  // Separar autores
-        descricao: safeDescricao
+        descricao
     };
 
     // Enviar dados ao backend
@@ -85,14 +81,14 @@ function favoriteBook(id_google, titulo, autores, descricao) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(book)
+        body: JSON.stringify(book) // JSON.stringify deve escapar automaticamente os caracteres especiais
     })
     .then(response => response.json())
     .then(result => alert(result.mensagem))
     .catch(err => console.error('Erro ao favoritar livro:', err));
 }
 
-
+        
         // Função para mostrar/ocultar favoritos
     function toggleFavorites() {
         const modal = document.getElementById('favoritesModal');
