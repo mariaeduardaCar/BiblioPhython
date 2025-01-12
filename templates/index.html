@@ -67,24 +67,42 @@
 
         // Função para favoritar livro
         function favoriteBook(id_google, titulo, autores, descricao) {
-            const book = {
-                id_google,
-                titulo,
-                autores: autores.split(', '),  // Separar autores
-                descricao
-            };
+    // Verificar se os parâmetros estão corretos
+    if (!id_google || !titulo || !autores || !descricao) {
+        alert("Por favor, forneça todos os dados necessários.");
+        return;
+    }
 
-            fetch('/favoritar', {  
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(book)
-            })
-            .then(response => response.json())
-            .then(result => alert(result.mensagem))
-            .catch(err => console.error('Erro ao favoritar livro:', err));
-        }
+    const book = {
+        id_google,
+        titulo,
+        autores: autores.split(', '),  // Separar autores em um array
+        descricao
+    };
+
+    // Verificar a estrutura do objeto para garantir que está correto
+    console.log(book);
+
+    // Fazer o fetch para enviar os dados do livro
+    fetch('/favoritar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(book)
+    })
+    .then(response => response.json())
+    .then(result => {
+        // Verificar o que está sendo retornado no resultado
+        console.log(result);
+        alert(result.mensagem);
+    })
+    .catch(err => {
+        console.error('Erro ao favoritar livro:', err);
+        alert("Ocorreu um erro ao favoritar o livro. Tente novamente.");
+    });
+}
+
 
         // Função para mostrar/ocultar favoritos
         // Função para mostrar/ocultar favoritos
