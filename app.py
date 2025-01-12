@@ -78,16 +78,22 @@ def favoritar_livro():
 @app.route('/favoritos', methods=['GET'])
 def ver_favoritos():
     conexao = conectar_banco()
-    cursor = conexao.cursor()
-
+    cursor = conexao.cursor(cursor_factory=psycopg2.extras.DictCursor)  # Usando DictCursor aqui
 
     cursor.execute("SELECT * FROM favoritos")
     favoritos = cursor.fetchall()
 
+    # Verificando se os dados estão sendo retornados corretamente
+    print(favoritos)  # Verifique no console do servidor
+
     cursor.close()
     conexao.close()
 
-    return jsonify(favoritos)
+    if favoritos:
+        return jsonify(favoritos)  # Retorna os favoritos no formato JSON
+    else:
+        return jsonify([])  # Retorna uma lista vazia caso não haja favoritos
+
 
 
 @app.route('/remover_favorito/<int:id>', methods=['DELETE'])

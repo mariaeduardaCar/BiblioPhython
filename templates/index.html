@@ -93,29 +93,32 @@
             favoriteBooksContainer.innerHTML = '';  // Limpar favoritos ao abrir o modal
 
             fetch('/favoritos')  
-                .then(response => response.json())
-                .then(favoritos => {
-                    if (favoritos.length === 0) {
-                        favoriteBooksContainer.innerHTML = '<p class="text-gray-600">Nenhum livro favoritado ainda.</p>';
-                    } else {
-                        favoritos.forEach(livro => {
-                            const bookDiv = document.createElement('div');
-                            bookDiv.classList.add('bg-gray-100', 'rounded-lg', 'p-4', 'text-center', 'flex', 'justify-between', 'items-center');
-                            bookDiv.innerHTML = `
-                                <div>
-                                    <h3 class="font-semibold text-lg text-gray-800">${livro.titulo}</h3>
-                                    <p class="text-gray-600">${livro.autores}</p>
-                                </div>
-                                <!-- Botão de X para remover o livro -->
-                                <button onclick="removeFavorite(${livro.id})" class="text-red-500 hover:text-red-700 text-xl">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            `;
-                            favoriteBooksContainer.appendChild(bookDiv);
-                        });
-                    }
-                })
-                .catch(err => console.error('Erro ao carregar favoritos:', err));
+    .then(response => response.json())
+    .then(favoritos => {
+        console.log(favoritos);  // Adicionando log para verificar os dados
+        const favoriteBooksContainer = document.getElementById('favoriteBooks');
+        favoriteBooksContainer.innerHTML = '';  // Limpar favoritos ao abrir o modal
+
+        if (favoritos.length === 0) {
+            favoriteBooksContainer.innerHTML = '<p class="text-gray-600">Nenhum livro favoritado ainda.</p>';
+        } else {
+            favoritos.forEach(livro => {
+                const bookDiv = document.createElement('div');
+                bookDiv.classList.add('bg-gray-100', 'rounded-lg', 'p-4', 'text-center', 'flex', 'justify-between', 'items-center');
+                bookDiv.innerHTML = `
+                    <div>
+                        <h3 class="font-semibold text-lg text-gray-800">${livro.titulo}</h3>
+                        <p class="text-gray-600">${livro.autores}</p>
+                    </div>
+                    <button onclick="removeFavorite(${livro.id})" class="text-red-500 hover:text-red-700 text-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                favoriteBooksContainer.appendChild(bookDiv);
+            });
+        }
+    })
+    .catch(err => console.error('Erro ao carregar favoritos:', err));
 
             modal.classList.toggle('hidden');
         }
