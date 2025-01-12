@@ -67,25 +67,30 @@
 
         // Função para favoritar livro
         function favoriteBook(id_google, titulo, autores, descricao) {
+    // Adiciona um prefixo ao id_google se começar com números
+    if (/^\d/.test(id_google)) {
+        id_google = 'ID-' + id_google;
+    }
+
     const book = {
         id_google,
         titulo,
-        autores: autores.split(', '),  // Separar autores em um array
+        autores: autores.split(', '),
         descricao
     };
 
-    console.log(book);  // Verifique se os dados estão estruturados corretamente
+    console.log(book);  // Verifique os dados enviados
 
     fetch('/favoritar', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(book)  // Envia os dados como string JSON
+        body: JSON.stringify(book)
     })
     .then(response => response.json())
     .then(result => {
-        console.log(result);  // Veja o que é retornado da API
+        console.log(result);  // Verifique a resposta do backend
         alert(result.mensagem);
     })
     .catch(err => {
@@ -94,8 +99,6 @@
     });
 }
 
-
-        // Função para mostrar/ocultar favoritos
         // Função para mostrar/ocultar favoritos
     function toggleFavorites() {
         const modal = document.getElementById('favoritesModal');
