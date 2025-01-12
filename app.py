@@ -110,7 +110,7 @@ def ver_favoritos():
         livros_favoritos.append({
             "titulo": favorito[2],
             "autores": favorito[3],
-            "id": favorito[1]    
+            "id": favorito[0]    
         })
 
     cursor.close()
