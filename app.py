@@ -6,14 +6,16 @@ from config import DB_CONFIG, GOOGLE_BOOKS_API_URL
 
 app = Flask(__name__)
 
+
 # Conexão com o banco de dados
 def conectar_banco():
     return psycopg2.connect(**DB_CONFIG)
 
+
 # Rota para a página inicial (index)
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html')  # Isso irá servir o arquivo index.html
 
 # Pesquisar livros na API do Google Books
 @app.route('/pesquisar', methods=['GET'])
@@ -51,42 +53,51 @@ def favoritar_livro():
         if not id_google or not titulo:
             return jsonify({"erro": "Campos obrigatórios ausentes"}), 400
 
-        with conectar_banco() as conexao:
-            with conexao.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
-                cursor.execute(
-                    "INSERT INTO favoritos (google_id, titulo, autores, descricao) VALUES (%s, %s, %s, %s)",
-                    (id_google, titulo, autores, descricao)
-                )
-                conexao.commit()
+        conexao = conectar_banco()
+        cursor = conexao.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+
+        cursor.execute(
+            "INSERT INTO favoritos (google_id, titulo, autores, descricao) VALUES ($1, $2, $3, $4)",
+            (id_google, titulo, autores, descricao)
+        )
+
+        conexao.commit()
+
+        cursor.close()
+        conexao.close()
 
         return jsonify({"mensagem": "Livro favoritado com sucesso"})
     except Exception as e:
-        print(f"Erro ao favoritar livro: {e}")
+        print(f"Erro ao favoritar livro: {e}")  # Exibe o erro no terminal
         return jsonify({"erro": "Erro interno no servidor"}), 500
 
 # Ver livros favoritados
 @app.route('/favoritos', methods=['GET'])
 def ver_favoritos():
-    with conectar_banco() as conexao:
-        with conexao.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
-            cursor.execute("SELECT * FROM favoritos")
-            favoritos = cursor.fetchall()
+    conexao = conectar_banco()
+    cursor = conexao.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM favoritos")
+    favoritos = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+
     return jsonify(favoritos)
 
+@app.route('/remover_favorito/<int:id>', methods=['DELETE'])
+def remover_favorito(id):
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
 
-@app.route('/remover_favorito/<int:book_id>', methods=['DELETE'])
-def remover_favorito(book_id):
-    if not book_id:
-        return jsonify({'error': 'ID do livro não fornecido'}), 400
-    try:
-        with conectar_banco() as conexao:
-            with conexao.cursor() as cursor:
-                cursor.execute("DELETE FROM favoritos WHERE id = %s", (book_id,))
-                conexao.commit()
-        return jsonify({"mensagem": "Livro removido dos favoritos com sucesso"}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    cursor.execute("DELETE FROM favoritos WHERE id = %s", (id,))
+    conexao.commit()
 
+    cursor.close()
+    conexao.close()
+
+    return jsonify({"mensagem": "Livro removido dos favoritos com sucesso"})
 
 
 if __name__ == '__main__':
